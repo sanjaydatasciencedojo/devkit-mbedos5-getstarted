@@ -24,7 +24,7 @@ This is the get started example of build a MXChip IoT DevKit App by using mbed c
 
 4. Upload to [MXChip IoT DevKit](aka.ms/iot-devkit):
 
-   - Connect your [MXChip IoT DevKit](aka.ms/iot-devkit) with your machine via USB.
+   - Connect the [MXChip IoT DevKit](aka.ms/iot-devkit) with your machine via USB.
    - You can find a removable USB Mass Storage disk named **AZ3166**.
    - Copy the ```.\BUILD\AZ3166\GCC_ARM\devkit-mbedos5-getstarted.bin``` into this disk.
    - The [MXChip IoT DevKit](aka.ms/iot-devkit) will reboot after finished the copy and run the new application.
