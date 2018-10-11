@@ -20,7 +20,7 @@ This is the get started example of build a MXChip IoT DevKit App by using mbed c
 
 3. Compile:
 
-   ```mbed compile -m AZ3166 -t GCC_ARM```
+   ```mbed compile -m AZ3166 -t GCC_ARM --profile debug```
 
 4. Upload to [MXChip IoT DevKit](aka.ms/iot-devkit):
 
