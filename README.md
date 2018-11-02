@@ -3,7 +3,7 @@ This is the get started example of build a MXChip IoT DevKit App by using mbed c
 
 1. Install [mbed CLI](https://os.mbed.com/docs/v5.10/tutorials/quick-start-offline.html) if you didn't have it on your machine.
    
-   *The mbed CLI requires Python 2.7, please make sure you install the right version*
+   *The mbed CLI requires Python 2.7, please make sure you have installed the right version*
    
 2. Clone the code:
 
