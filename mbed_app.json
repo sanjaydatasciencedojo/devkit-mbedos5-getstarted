@@ -12,6 +12,7 @@
         "HSM_TYPE_SAS_TOKEN",
         "HSM_TYPE_X509",
         "HSM_TYPE_SYMM_KEY",
+        "USE_MBED_TLS",
         "MBED_HEAP_STATS_ENABLED=1",
         "MBED_STACK_STATS_ENABLED=1",
         "DEBUG=1"
