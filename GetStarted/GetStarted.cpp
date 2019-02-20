@@ -5,6 +5,7 @@
 #include "AZ3166WiFi.h"
 #include "AzureIotHub.h"
 #include "DevKitMQTTClient.h"
+#include "IoT_DevKit_HW.h"
 
 #include "config.h"
 #include "utility.h"
@@ -91,6 +92,18 @@ static int  DeviceMethodCallback(const char *methodName, const unsigned char *pa
   return result;
 }
 
+static void IniTIoTClient()
+{
+  //DevKitMQTTClient_SetOption("TrustedCerts", certEdge);
+  DevKitMQTTClient_Init();
+  DevKitMQTTClient_SetSendConfirmationCallback(SendConfirmationCallback);
+  DevKitMQTTClient_SetMessageCallback(MessageCallback);
+  DevKitMQTTClient_SetDeviceTwinCallback(DeviceTwinCallback);
+  DevKitMQTTClient_SetDeviceMethodCallback(DeviceMethodCallback);
+
+  send_interval_ms = SystemTickCounterRead();
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Arduino sketch
 void setup()
@@ -118,14 +131,8 @@ void setup()
 
   Screen.print(3, " > IoT Hub");
   DevKitMQTTClient_SetOption(OPTION_MINI_SOLUTION_NAME, "GetStarted");
-  DevKitMQTTClient_Init(true);
-
-  DevKitMQTTClient_SetSendConfirmationCallback(SendConfirmationCallback);
-  DevKitMQTTClient_SetMessageCallback(MessageCallback);
-  DevKitMQTTClient_SetDeviceTwinCallback(DeviceTwinCallback);
-  DevKitMQTTClient_SetDeviceMethodCallback(DeviceMethodCallback);
-
-  send_interval_ms = SystemTickCounterRead();
+  // LogInfo(">>> Connect string: %s", getIoTHubConnectionString());
+  IniTIoTClient();
 }
 
 void loop()
