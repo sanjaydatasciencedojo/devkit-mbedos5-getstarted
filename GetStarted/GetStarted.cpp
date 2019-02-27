@@ -5,11 +5,24 @@
 #include "AZ3166WiFi.h"
 #include "AzureIotHub.h"
 #include "DevKitMQTTClient.h"
-#include "IoT_DevKit_HW.h"
 
 #include "config.h"
 #include "utility.h"
 #include "SystemTickCounter.h"
+
+// If you want to connect IoT DevKit to an IoT Edge device which has been configured to a
+// transparent gateway (https://docs.microsoft.com/en-us/azure/iot-edge/how-to-create-transparent-gateway) 
+// as a leaf device (https://docs.microsoft.com/en-us/azure/iot-edge/how-to-connect-downstream-device),
+// please set the value of edgeCert to the right root cert and uncomment the PLAY_AS_LEAF_DEVICE
+
+// #define PLAY_AS_LEAF_DEVICE
+
+#if defined(PLAY_AS_LEAF_DEVICE)
+static const char edgeCert [] =
+"-----BEGIN CERTIFICATE-----\r\n"
+"Put your cert here"
+"-----END CERTIFICATE-----\r\n";
+#endif // PLAY_AS_LEAF_DEVICE
 
 static bool hasWifi = false;
 int messageCount = 1;
@@ -94,7 +107,10 @@ static int  DeviceMethodCallback(const char *methodName, const unsigned char *pa
 
 static void IniTIoTClient()
 {
-  //DevKitMQTTClient_SetOption("TrustedCerts", certEdge);
+  DevKitMQTTClient_SetOption(OPTION_MINI_SOLUTION_NAME, "GetStarted");
+#if defined(PLAY_AS_LEAF_DEVICE)
+  DevKitMQTTClient_SetOption("TrustedCerts", edgeCert);
+#endif // PLAY_AS_LEAF_DEVICE
   DevKitMQTTClient_Init();
   DevKitMQTTClient_SetSendConfirmationCallback(SendConfirmationCallback);
   DevKitMQTTClient_SetMessageCallback(MessageCallback);
@@ -130,8 +146,6 @@ void setup()
   SensorInit();
 
   Screen.print(3, " > IoT Hub");
-  DevKitMQTTClient_SetOption(OPTION_MINI_SOLUTION_NAME, "GetStarted");
-  // LogInfo(">>> Connect string: %s", getIoTHubConnectionString());
   IniTIoTClient();
 }
 
