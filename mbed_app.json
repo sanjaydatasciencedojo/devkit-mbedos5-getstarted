@@ -14,7 +14,6 @@
         "LPS25HB_I2C_PORT=MICO_I2C_1",
         "LWIP_TIMEVAL_PRIVATE=0",
         "DONT_USE_UPLOADTOBLOB",
-        "USE_PROV_MODULE",
         "HSM_TYPE_X509",
         "HSM_TYPE_SYMM_KEY",
         "DEBUG=1"
