@@ -14,7 +14,7 @@
 // transparent gateway (https://docs.microsoft.com/en-us/azure/iot-edge/how-to-create-transparent-gateway) 
 // as a leaf device (https://docs.microsoft.com/en-us/azure/iot-edge/how-to-connect-downstream-device),
 // please set the value of edgeCert to the right root cert and uncomment the PLAY_AS_LEAF_DEVICE
-
+   
 // #define PLAY_AS_LEAF_DEVICE
 
 #if defined(PLAY_AS_LEAF_DEVICE)
