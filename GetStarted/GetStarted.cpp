@@ -130,7 +130,7 @@ void setup()
   
   Screen.print(3, " > Serial");
   Serial.begin(115200);
-
+  
   // Initialize the WiFi module
   Screen.print(3, " > WiFi");
   hasWifi = false;
