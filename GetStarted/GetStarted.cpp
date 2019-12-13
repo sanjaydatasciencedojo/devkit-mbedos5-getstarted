@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. 
 // To get started please visit https://microsoft.github.io/azure-iot-developer-kit/docs/projects/connect-iot-hub?utm_source=ArduinoExtension&utm_medium=ReleaseNote&utm_campaign=VSCode
-#include "Arduino.h"
 #include "AZ3166WiFi.h"
 #include "AzureIotHub.h"
 #include "DevKitMQTTClient.h"
@@ -10,24 +9,14 @@
 #include "utility.h"
 #include "SystemTickCounter.h"
 
-// If you want to connect IoT DevKit to an IoT Edge device which has been configured to a
-// transparent gateway (https://docs.microsoft.com/en-us/azure/iot-edge/how-to-create-transparent-gateway) 
-// as a leaf device (https://docs.microsoft.com/en-us/azure/iot-edge/how-to-connect-downstream-device),
-// please set the value of edgeCert to the right root cert and uncomment the PLAY_AS_LEAF_DEVICE
-   
-// #define PLAY_AS_LEAF_DEVICE
-
-#if defined(PLAY_AS_LEAF_DEVICE)
-static const char edgeCert [] =
-"-----BEGIN CERTIFICATE-----\r\n"
-"Put your cert here"
-"-----END CERTIFICATE-----\r\n";
-#endif // PLAY_AS_LEAF_DEVICE
-
 static bool hasWifi = false;
 int messageCount = 1;
+int sentMessageCount = 0;
 static bool messageSending = true;
 static uint64_t send_interval_ms;
+
+static float temperature;
+static float humidity;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Utilities
@@ -54,7 +43,18 @@ static void SendConfirmationCallback(IOTHUB_CLIENT_CONFIRMATION_RESULT result)
   if (result == IOTHUB_CLIENT_CONFIRMATION_OK)
   {
     blinkSendConfirmation();
+    sentMessageCount++;
   }
+
+  Screen.print(1, "> IoT Hub");
+  char line1[20];
+  sprintf(line1, "Count: %d/%d",sentMessageCount, messageCount); 
+  Screen.print(2, line1);
+
+  char line2[20];
+  sprintf(line2, "T:%.2f H:%.2f", temperature, humidity);
+  Screen.print(3, line2);
+  messageCount++;
 }
 
 static void MessageCallback(const char* payLoad, int size)
@@ -105,21 +105,6 @@ static int  DeviceMethodCallback(const char *methodName, const unsigned char *pa
   return result;
 }
 
-static void IniTIoTClient()
-{
-  DevKitMQTTClient_SetOption(OPTION_MINI_SOLUTION_NAME, "GetStarted");
-#if defined(PLAY_AS_LEAF_DEVICE)
-  DevKitMQTTClient_SetOption("TrustedCerts", edgeCert);
-#endif // PLAY_AS_LEAF_DEVICE
-  DevKitMQTTClient_Init();
-  DevKitMQTTClient_SetSendConfirmationCallback(SendConfirmationCallback);
-  DevKitMQTTClient_SetMessageCallback(MessageCallback);
-  DevKitMQTTClient_SetDeviceTwinCallback(DeviceTwinCallback);
-  DevKitMQTTClient_SetDeviceMethodCallback(DeviceMethodCallback);
-
-  send_interval_ms = SystemTickCounterRead();
-}
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Arduino sketch
 void setup()
@@ -130,7 +115,7 @@ void setup()
   
   Screen.print(3, " > Serial");
   Serial.begin(115200);
-  
+
   // Initialize the WiFi module
   Screen.print(3, " > WiFi");
   hasWifi = false;
@@ -146,7 +131,15 @@ void setup()
   SensorInit();
 
   Screen.print(3, " > IoT Hub");
-  IniTIoTClient();
+  DevKitMQTTClient_SetOption(OPTION_MINI_SOLUTION_NAME, "DevKit-GetStarted");
+  DevKitMQTTClient_Init(true);
+
+  DevKitMQTTClient_SetSendConfirmationCallback(SendConfirmationCallback);
+  DevKitMQTTClient_SetMessageCallback(MessageCallback);
+  DevKitMQTTClient_SetDeviceTwinCallback(DeviceTwinCallback);
+  DevKitMQTTClient_SetDeviceMethodCallback(DeviceMethodCallback);
+
+  send_interval_ms = SystemTickCounterRead();
 }
 
 void loop()
@@ -159,7 +152,7 @@ void loop()
       // Send teperature data
       char messagePayload[MESSAGE_MAX_LEN];
 
-      bool temperatureAlert = readMessage(messageCount++, messagePayload);
+      bool temperatureAlert = readMessage(messageCount, messagePayload, &temperature, &humidity);
       EVENT_INSTANCE* message = DevKitMQTTClient_Event_Generate(messagePayload, MESSAGE);
       DevKitMQTTClient_Event_AddProp(message, "temperatureAlert", temperatureAlert ? "true" : "false");
       DevKitMQTTClient_SendEventInstance(message);
@@ -171,5 +164,5 @@ void loop()
       DevKitMQTTClient_Check();
     }
   }
-  delay(10);
+  delay(1000);
 }
